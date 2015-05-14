@@ -17,10 +17,8 @@ Explanation on the flags:
 
 To produce an executable is no problem. `gcc -m32 -g code.s` or you can  
 take the long route and type this  
-`
-as code.s -o code.o  
-ld code.o -o runexe
-`
+`as code.s -o code.o`  
+`ld code.o -o runexe`  
   
 You can also check the exit code of a program by running `echo $?`  
   
