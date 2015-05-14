@@ -1,3 +1,5 @@
+# Demonstrating simple use of cmd args via assembly
+
   .section .data
 
 LC0:
@@ -40,5 +42,6 @@ main:
   movl    $LC1,     (%esp)
   call    printf
 
-  movl    $0,       %eax       # get exit code ready 0 
+  movl    $1,       %eax       # sys call number 1
+  movl    $0,       %ebx       # exit code 0
   int     $0x80                # interrupt to kernel to exit
