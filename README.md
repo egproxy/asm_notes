@@ -16,9 +16,9 @@ Explanation on the flags:
 -O0:  Optimization set to 0, [0-3]  
 
 To produce an executable is no problem. `gcc -m32 -g code.s` or you can  
-take the long route and type this 
+take the long route and type this  
 `
-as code.s -o code.o
+as code.s -o code.o  
 ld code.o -o runexe
 `
   
