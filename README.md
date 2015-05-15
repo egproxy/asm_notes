@@ -20,6 +20,9 @@ take the long route and type this
 `as code.s -o code.o`  
 `ld code.o -o runexe`  
   
+`main.c` & Makefile included is my test outputter. Running `make` or  
+`make all` will produce assembly output  
+  
 You can also check the exit code of a program by running `echo $?`  
   
 <3 GDB is love, GDB is life  <3  
