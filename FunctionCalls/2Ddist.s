@@ -1,7 +1,7 @@
   .section .data
 
 LC0:
-  .ascii "Distance: %i\n\0"
+  .ascii "Distance: %f\n\0"
 
   .section .text
   .globl main
@@ -17,7 +17,7 @@ main:
   pushl   $5
   call    dist
   addl    $12,         %esp
-  fist    (%esp)
+  fstpl   (%esp)
   pushl   $LC0
   call    printf
   
