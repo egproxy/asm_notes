@@ -5,11 +5,16 @@
 bn_new:
 	pushl	%ebp
 	movl	%esp, %ebp
-
-	# Return NULL
-	xorl	%eax, %eax
-
-	leave
+  andl  $-16, %esp
+  subl  $4, %esp
+  movl  $12, (%esp)
+  call  malloc
+  movl  $0, (%eax)
+  movl  $0, 4(%eax)
+  movl  $0, 8(%eax)
+  addl  $4, %esp 
+  movl  %ebp, %esp
+  popl  %ebp 
 	ret
 	.size	bn_new, .-bn_new
 
