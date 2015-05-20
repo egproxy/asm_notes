@@ -1,7 +1,8 @@
-CFLAGS := -m32 -g -S -O0 -o asm.s
+OTFILE := asm.s
+CFLAGS := -m32 -g -S -O0 -o $(OTFILE)
 
 all:
-	gcc $(CFLAGS) main.c
+	$(CC) $(CFLAGS) main.c
     
 clean:
-	$(RM) main.o main.s a.out; ls
+	$(RM) main.o $(OTFILE) a.out; ls
