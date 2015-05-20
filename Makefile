@@ -1,4 +1,4 @@
-CFLAGS := -m32 -g -S -O0
+CFLAGS := -m32 -g -S -O0 -o asm.s
 
 all:
 	gcc $(CFLAGS) main.c
