@@ -48,7 +48,6 @@ forceexit:
 makeLower:
   pushl %ebp
   movl  %esp,     %ebp
-  subl  $4,       %esp   
   xorl  %ebx,     %ebx
   movl  8(%ebp),  %eax
 
