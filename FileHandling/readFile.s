@@ -26,6 +26,9 @@ LC0: .asciz "Invalid File Descriptor: %i\n"
 
 LC1: .asciz "Got Data: %s\n"
 
+  .section .rodata
+DOUT: .asciz "out.txt"      # default output filename
+
   .section .text
 
   .globl main
@@ -33,7 +36,7 @@ LC1: .asciz "Got Data: %s\n"
 main:
   pushl       %ebp
   movl        %esp,         %ebp
-  subl        $16,          %esp
+  subl        $20,          %esp
 
   movl        12(%ebp),     %eax
   movl        4(%eax),      %eax 
@@ -42,10 +45,18 @@ main:
   call        openfile
   cmpl        $0,           %eax 
   jl          invalid_fd
-  movl        %eax,         12(%esp)      ## BOTTOM OF STACK HOLDS READ FILE
-  
+  movl        %eax,         16(%esp)      ## BOTTOM OF STACK HOLDS READ FILE
+
+# USE DEFAULT IF NO 3RD ARGV GIVEN
+  movl        8(%ebp),      %eax
+  cmpl        $3,           %eax
+  jge         specified
+  movl        $DOUT,        %eax
+  jmp         openout
+specified:
   movl        12(%ebp),     %eax
   movl        8(%eax),      %eax
+openout:
   movl        $MODE_RW,     %ebp
   orl         $MODE_CREAT,  %ebp
   orl         $MODE_TRUNC,  %ebp
@@ -54,12 +65,11 @@ main:
   call        openfile
   cmpl        $0,           %eax 
   jl          invalid_fd 
-  movl        %eax,         8(%esp)       ## 2ND TO BOTTOM HOLDS OUTPUT FILE
-brk:
+  movl        %eax,         12(%esp)       ## 2ND TO BOTTOM HOLDS OUTPUT FILE
   
  ## START READING FROM INPUT FILE  
 dountil_EOF:
-  movl        12(%esp),     %eax
+  movl        16(%esp),     %eax
   movl        %eax,         (%esp)
   movl        $BUFF,        4(%esp)
   movl        $256,         8(%esp)
@@ -67,16 +77,20 @@ dountil_EOF:
   
   cmpl        $0,           %eax
   jle         dountil_END
+  
+    
+  movl        %eax,         8(%esp)         ## SZ OF BUFFER to 3rd arg
 
-  movl        $BUFF,        4(%esp)
-  movl        $LC1,         (%esp) 
-  call        printf
+  movl        $BUFF,        (%esp)
+  call        makeLower
 
+  movl        %eax,         4(%esp)         ## BUFFER to 2nd arg
+  movl        12(%esp),     %eax
+  movl        %eax,         (%esp)          ## RW-FD to 1st arg
+  call        writefile
   jmp         dountil_EOF
 
 dountil_END:
-
-
  ## CLOSE OPEN FILES 
   movl        12(%esp),     %eax
   movl        %eax,         (%esp)
@@ -93,7 +107,7 @@ invalid_fd:
   call        printf
 
 fin: 
-  addl        $8,           %esp        # dealloc stack space
+  addl        $16,           %esp        # dealloc stack space
   movl        $1,           %eax
   movl        $0,           %ebx
   int         $0x80
@@ -154,5 +168,51 @@ readfile:
   popl        %ebp
   ret
 
-# .type writefile, @function
-# writefile:
+# FUNCTION: readfile 
+# PARAMETERS: 
+#   8(%ebp) - valid file descriptor
+#  12(%ebp) - pointer to buffer
+#  16(%ebp) - size of buffer
+# RETURN:
+#  Number of bytes read or error code
+ .type writefile, @function
+ writefile:
+  pushl       %ebp
+  movl        %esp,         %ebp
+  movl        $FWRITE,      %eax
+  movl        8(%ebp),      %ebx 
+  movl        12(%ebp),     %ecx
+  movl        16(%ebp),     %edx
+  int         $0x80
+  movl        %ebp,         %esp
+  popl        %ebp
+  ret
+
+# FUNCTION: makeLower
+# PARAMETERS:
+#   8(%ebp) - address of cstring to be converted
+# RETURN:
+#   cstring converted to lowercase
+.type makeLower, @function
+makeLower:
+  pushl %ebp
+  movl  %esp,     %ebp
+  xorl  %ebx,     %ebx
+  movl  8(%ebp),  %eax
+loop:
+  movb  (%eax, %edi, 1), %bl
+  cmpl  $0,       %ebx
+  je    mlfin
+  cmpl  $65,      %ebx
+  jl    next
+  cmpl  $90,      %ebx
+  ja    next
+  addl  $32,      %ebx
+  movb  %bl,      (%eax, %edi, 1)
+next:
+  inc   %edi
+  jmp   loop
+mlfin:
+  movl  %ebp,     %esp
+  popl  %ebp
+  ret
