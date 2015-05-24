@@ -46,9 +46,10 @@ main:
   
   movl        12(%ebp),     %eax
   movl        8(%eax),      %eax
-  movl        $MODE_RW,     4(%esp)
-  orl         $MODE_CREAT,  4(%esp)
-  orl         $MODE_TRUNC,  4(%esp)
+  movl        $MODE_RW,     %ebp
+  orl         $MODE_CREAT,  %ebp
+  orl         $MODE_TRUNC,  %ebp
+  movl        %ebp,         4(%esp)
   movl        %eax,         (%esp)
   call        openfile
   cmpl        $0,           %eax 
