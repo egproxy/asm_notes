@@ -1,9 +1,20 @@
 # Filename: readFile.s
-# Read strings from a file using a buffer
+# Demonstrates read strings from a file using a buffer.
+# 
+# Usage:
+# ./a.out filename.txt [ outputfile.txt = "out.txt" ]
+#
+# filename.txt must be readable. "outputfile.txt" defaults to out.txt
+# if no argument is supplied. If no file by the name "outputfile.txt"
+# exists, program will create it.
+#
+# Purpose:
+# Program reads all text from an input file and writes the lowercase
+# equivalent to an output file.
+
 
 # constants can be declared with .equ which is not initialized in any section
 # but replaced by the assembler.
-  
 .equ FREAD,   0x3
 .equ FWRITE,  0x4
 .equ FOPEN,   0x5
@@ -23,8 +34,6 @@
   .section .data
 
 LC0: .asciz "Invalid File Descriptor: %i\n"
-
-LC1: .asciz "Got Data: %s\n"
 
   .section .rodata
 DOUT: .asciz "out.txt"      # default output filename
