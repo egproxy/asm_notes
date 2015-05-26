@@ -177,13 +177,13 @@ readfile:
   popl        %ebp
   ret
 
-# FUNCTION: readfile 
+# FUNCTION: writefile 
 # PARAMETERS: 
 #   8(%ebp) - valid file descriptor
-#  12(%ebp) - pointer to buffer
+#  12(%ebp) - pointer to buffer to be written
 #  16(%ebp) - size of buffer
 # RETURN:
-#  Number of bytes read or error code
+#  Number of bytes written or error code
  .type writefile, @function
  writefile:
   pushl       %ebp

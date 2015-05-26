@@ -23,7 +23,19 @@ bn_new:
 bn_free:
 	pushl	%ebp
 	movl	%esp, %ebp
-
+  movl  8(%ebp), %ebx
+  movl  (%ebx),  %ecx   # size
+  movl  8(%ebx), %edx   # d
+freeloop_START:
+  cmpl  $0, %ecx
+  jb   freeloop_END
+  decl  %ecx
+  movl  (%edx,%ecx,4), %eax
+  call  free
+  jmp   freeloop_START
+freeloop_END:
+  movl  %ebx,   %eax
+  call  free
 	leave
 	ret
 	.size	bn_new, .-bn_new
@@ -34,9 +46,26 @@ bn_free:
 bn_hex2bn:
 	pushl	%ebp
 	movl	%esp, %ebp
+  subl  $16,   %esp
+  movl  12(%ebp), %ebx
+  movl  %ebx, 12(%esp)
+  movl  8(%ebp), %ebx
+  xorl  %ecx, %ecx
+  xorl  %edi, %edi      # zero out the index register
+  
+  movl  $8, (%esp) 
+  call  malloc
+  cmpl  %eax, $0   # is there enough memory
+  pushl %eax      # create limb and push onto stack
+  
+  incl  4(%ebx)   # increment num of limbs
 
-	# Return -1
-	movl	$-1, %eax
+
+tolower_START:
+  movb  (%esp, %edi, 1), %cl
+  cmpl  $0, %ecx
+  
+
 
 	leave
 	ret
