@@ -1,49 +1,55 @@
-  .section .data
-
-LC0: .asciz "Number of limbs: %i\n"
-
 
 	.file	"bn.s"
-	.text
+	.section .text
+
+# Function: bn_new
+# Purpose:
+#  Create new bn struct and return it
+#
 	.globl	bn_new
 	.type	bn_new, @function
 bn_new:
 	pushl	%ebp
-	movl	%esp, %ebp
-  andl  $-16, %esp
-  subl  $4, %esp
-  movl  $12, (%esp)
+	movl	%esp,       %ebp
+  subl  $4,         %esp
+  movl  $12,        (%esp)
   call  malloc
-  movl  $0, (%eax)
-  movl  $0, 4(%eax)
-  movl  $0, 8(%eax)
-  addl  $4, %esp 
-  movl  %ebp, %esp
+  movl  $0,         (%eax)    # Set size to 0
+  movl  $0,         4(%eax)   # Set numOfLimbs to 0
+  movl  $0,         8(%eax)   # Set *d to NULL
+  addl  $4,         %esp 
+  movl  %ebp,       %esp
   popl  %ebp 
 	ret
 	.size	bn_new, .-bn_new
 
+
+# Function: bn_free
+# Purpose: 
+#   Takes a bn struct and zero's out all its data
+#   Dynamically allocated d will be freed from the
+#   heap. Finally, deallocate the struct
+#
 	.globl	bn_free
 	.type	bn_free, @function
 bn_free:
 	pushl	%ebp
-	movl	%esp, %ebp
-  movl  8(%ebp), %ebx
-  movl  (%ebx),  %ecx   # size
-  movl  8(%ebx), %edx   # d
-freeloop_START:
-  cmpl  $0, %ecx
-  jb   freeloop_END
-  decl  %ecx
-  movl  (%edx,%ecx,4), %eax
+	movl	%esp,       %ebp
+  subl  $4,         %esp
+  movl  8(%ebp),    %ebx      # holds address to struct bn
+  cmpl  $0,         8(%ebx)   # check if anything was allocated in *d
+  je    BND_EMPTY             # skip on NULL
+  movl  8(%ebx),    %eax
+  movl  %eax,       (%esp)    # Otherwise, free the heap
   call  free
-  jmp   freeloop_START
-freeloop_END:
-  movl  %ebx,   %eax
-  call  free
+  BND_EMPTY:
+  movl  %ebx,       (%esp)      
+  call  free                  # Deallocat the struct
+  addl  $4,         %esp      # Clear extra space from stack
 	leave
 	ret
 	.size	bn_new, .-bn_new
+
 
 
 	.globl	bn_hex2bn
