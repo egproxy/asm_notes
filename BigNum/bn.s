@@ -1,3 +1,8 @@
+  .section .data
+
+LC0: .asciz "Number of limbs: %i\n"
+
+
 	.file	"bn.s"
 	.text
 	.globl	bn_new
@@ -45,31 +50,32 @@ freeloop_END:
 	.type	bn_hex2bn, @function
 bn_hex2bn:
 	pushl	%ebp
-	movl	%esp, %ebp
-  subl  $16,   %esp
-  movl  12(%ebp), %ebx
-  movl  %ebx, 12(%esp)
-  movl  8(%ebp), %ebx
-  xorl  %ecx, %ecx
-  xorl  %edi, %edi      # zero out the index register
-  
-  movl  $8, (%esp) 
+	movl	%esp,     %ebp
+  subl  $16,      %esp
+  pushl 12(%ebp)
+  call  strlen
+  xorl  %edx,     %edx
+  movl  $8,       %ebx
+  divl  %ebx
+  movl  %eax,     4(%esp)   # find how many limbs are needed
+  movl  8(%ebp),  %ebx 
+  movl  %eax,     4(%ebx)
+  cmpl  $0,       %edx 
+  je    noremain
+  incl  4(%ebx)
+noremain:
+  movl  4(%ebx),  %eax 
+  movl  %eax,     (%ebx)
+  movl  %eax,     (%esp)
   call  malloc
-  cmpl  %eax, $0   # is there enough memory
-  pushl %eax      # create limb and push onto stack
-  
-  incl  4(%ebx)   # increment num of limbs
-
-
-tolower_START:
-  movb  (%esp, %edi, 1), %cl
-  cmpl  $0, %ecx
-  
-
+  movl  %eax,     8(%ebx)   # store array of u32ints to d
+                            # represented by array of pointers to 4 bytes
 
 	leave
 	ret
 	.size	bn_hex2bn, .-bn_hex2bn
+
+
 
 	.globl	bn_bn2hex
 	.type	bn_bn2hex, @function
