@@ -11,7 +11,7 @@ int main()
 	assert(y);
 	assert(z);
 
-	int ret = bn_hex2bn(x, "Feed");
+	int ret = bn_hex2bn(x, "Feedf00D");
 	assert(!ret);
 	ret = bn_hex2bn(y, "CafeF00d5");
 	assert(!ret);

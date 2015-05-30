@@ -71,7 +71,7 @@ _hexc_LPE:
   movl %ebx, (%esp)
   movl $0,  4(%esp)
   movl $16, 8(%esp)
-  call strtol 
+  call strtoul 
   jmp _hexc_END
 _hexc_ERR:
   movl $-1, %eax

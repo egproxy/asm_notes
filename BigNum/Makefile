@@ -4,6 +4,7 @@ LDFLAGS := -m32
 .PHONY: all clean
 
 all: bn
+	gdb bn
 clean:
 	$(RM) bn main.o bn.o
 %.o: %.s
